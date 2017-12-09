@@ -12,14 +12,15 @@ def search(term, keys, path):
 
 
 def searchHelper(term, key, path):
+    term = term.lower()
     for f in utilities.walkMusicFiles(path):
         if key == 'filename':
-            if term in f:
+            if term in f.lower():
                 yield f
         else:
             if os.path.splitext(f)[1] == '.mp3':
                 songdata = EasyID3(f)
-                if key in songdata.keys() and len(list(filter(lambda x : term in x, songdata[key]))): #this could be a bit shorter using lists instead of filter
+                if key in songdata.keys() and len(list(filter(lambda x : term in x.lower(), songdata[key]))): #this could be a bit shorter using lists instead of filter
                     yield f
                 
 
