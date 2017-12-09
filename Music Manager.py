@@ -7,6 +7,7 @@ from mutagen.easyid3 import EasyID3
 from pprint import pprint
 
 from edit import edit
+from search import search
 
 
 class Manager:
@@ -25,7 +26,7 @@ class Manager:
         ### File Widget ###
         self.file_widget = ttk.Treeview(self.root)
         self.selected = None
-        self.file_widget.heading("#0", text="C:/path/to/music/", anchor=tk.W)
+        self.file_widget.heading("#0", text="C:\\Users\\Russell\\Desktop\\Programming\\Music-Management\\Music", anchor=tk.W)
 
         self.file_list = []
         self.file_tree = self.build_file_tree("C:\\Users\\Russell\\Desktop\\Programming\\Music-Management\\Music")
@@ -52,16 +53,24 @@ class Manager:
         self.submit_button = ttk.Button(self.search_tab, text="go", command=self.search, width=3)
         self.submit_button.grid(row=0, column=2)
 
-        self.search_checkbuttons = [tk.Checkbutton(self.search_tab, text=tag) for tag in self.tag_list]
-        for i, checkbutton in enumerate(self.search_checkbuttons[:3]):
+        tk.Label(self.search_tab, text="", width=60).grid(row=0, column=3)
+
+        self.search_checkbutton_vars = {tag: tk.IntVar() for tag in self.tag_list}
+        self.search_checkbuttons = {tag: tk.Checkbutton(self.search_tab, text=tag, variable=self.search_checkbutton_vars[tag]) for tag in self.tag_list}
+        for i, checkbutton in enumerate(list(self.search_checkbuttons.values())[:3]):
             checkbutton.deselect()
             checkbutton.grid(row=1 + i, column=0, sticky=tk.W)
-        for i, checkbutton in enumerate(self.search_checkbuttons[3:]):
+        for i, checkbutton in enumerate(list(self.search_checkbuttons.values())[3:]):
             checkbutton.deselect()
             checkbutton.grid(row=1 + i, column=1, sticky=tk.W)
 
         self.results_list = ttk.Treeview(self.search_tab)
-        self.results_list.grid(row=4, columnspan=3)
+        self.results_list.grid(row=4, column=0, columnspan=4, sticky=tk.W+tk.E+tk.N+tk.S)
+
+        # Convert Tab
+        self.convert_tab = ttk.Frame(self.action_widget)
+        self.action_widget.add(self.convert_tab, text='Convert')
+        self.filename_label = ttk.Label()
 
         # Pack widgets to root
         self.file_widget.pack(expand=1, side=tk.LEFT, fill="both")
@@ -106,9 +115,11 @@ class Manager:
             edit(self.get_selected_filename(), key, self.tag_entries[key].get())
 
     def search(self):
-        print("searching!")
-        print("entry: " + self.search_entry.get())
-        self.results_list.insert("", "end", text=self.search_entry.get()+".mp3")
+        self.results_list.delete(*self.results_list.get_children())
+        keys = [tag for tag in self.tag_list if self.search_checkbutton_vars[tag].get()]
+        results = search(self.search_entry.get(), keys, "C:\\Users\\Russell\\Desktop\\Programming\\Music-Management\\Music")
+        for result in results:
+            self.results_list.insert("", "end", text=result.split("Music\\")[-1])
 
     def run(self):
         while self.alive:
@@ -120,10 +131,6 @@ class Manager:
     def quit(self):
         self.alive = False
         self.root.destroy()
-
-
-
-
 
 
 if __name__ == "__main__":
