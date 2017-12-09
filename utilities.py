@@ -10,12 +10,12 @@ def walkMusicFiles(path):
         if os.path.splitext(fname)[1] in types:
             yield fname
 
-def build_file_list(self, top, file_list=[]):
+def build_file_list(top, file_list=[]):
     for item in sorted(os.listdir(top), key=lambda x: x.split(".")[-1]):
         item = os.path.join(top, item)
         file_list.append(item)
         if os.path.isfile(item):
             pass
         else:
-            file_list += self.build_file_list(item, file_list)
+            file_list += build_file_list(item, file_list)
     return file_list
