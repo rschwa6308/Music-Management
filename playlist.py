@@ -4,7 +4,10 @@ import os
 
 #creats a playlist from a directory
 def playlist(path, playlistname, start='', end='', abspath=True, slash=os.sep):
-    return playlistFromList(utilities.walkMusicFiles(path), playlistname, start, end, abspath, slash) #currently returns None, might change
+    if os.path.isdir(path):
+        playlistFromList(utilities.walkMusicFiles(path), playlistname, start, end, abspath, slash) #currently returns None, might change
+    elif os.path.isfile(path):
+        playlistFromList([path], playlistname, start, end, abspath, slash)
 
 #creates a playlist from a list of files
 def playlistFromList(files, playlistname, start='', end='', abspath=True, slash=os.sep):
