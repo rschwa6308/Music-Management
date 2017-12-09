@@ -8,6 +8,7 @@ from pprint import pprint
 
 from edit import edit
 from search import search
+from covert import convert
 
 import utilities
 import codecs
@@ -17,7 +18,7 @@ class Manager:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("Music Manager")    # TODO: choose application name
-        self.root.geometry("800x600")       # TODO: choose window size
+        self.root.geometry("1000x800")       # TODO: choose window size
 
         self.alive = True
         self.root.protocol('WM_DELETE_WINDOW', self.quit)
@@ -74,11 +75,16 @@ class Manager:
         # Convert Tab
         self.convert_tab = ttk.Frame(self.action_widget)
         self.action_widget.add(self.convert_tab, text='Convert')
-        self.filename_label = ttk.Label()
+        self.filename_label = tk.Label(self.convert_tab)
+        self.filename_label.grid(row=0, column=0, columnspan=10, sticky=tk.W)
+        tk.Label(self.convert_tab, text="Convert to: ").grid(row=1, column=0)
+        self.filetype_entry = ttk.Combobox(self.convert_tab, values=[".mp3", ".wav"])
+        self.filetype_entry.grid(row=1, column=1)
+        ttk.Button(self.convert_tab, text="go", width=8, command=self.convert).grid(row=2, column=0, columnspan=2)
 
         # Pack widgets to root
         self.file_widget.pack(expand=1, side=tk.LEFT, fill="both")
-        self.action_widget.pack(expand=1, side=tk.RIGHT, fill="both")
+        self.action_widget.pack(expand=0, side=tk.RIGHT, fill="both")
 
     def build_file_tree(self, top, parentid=""):
         tree = {top: []}
@@ -97,6 +103,7 @@ class Manager:
         item_tags = {"title": "", "artist": "", "album": "", "tracknumber": "", "date": ""}
         path = self.get_selected_filename()
         if path and os.path.isfile(path):
+
             item_tags = EasyID3(path)
             for tag in self.tag_list:
                 try:
@@ -106,8 +113,21 @@ class Manager:
                     pass
         elif path and os.path.isdir(path):
             for key, tag in zip(self.tag_list_keys, self.tag_list):
+
+            try:
+                item_tags = EasyID3(path)
+            except:
+                pass
+        for tag in self.tag_list:
+            try:
                 self.tag_entries[tag].delete(0, tk.END)
                 self.tag_entries[tag].insert(0, key)
+            except:
+                pass
+
+        if self.selected:
+            print(self.get_selected_filename().split("\\")[-1])
+            self.filename_label["text"] = self.get_selected_filename().split("\\")[-1]
 
     def get_selected_filename(self):
         if len(self.selected) == 1:
@@ -133,6 +153,9 @@ class Manager:
         results = search(self.search_entry.get(), keys, os.path.abspath('Music'))
         for result in results:
             self.results_list.insert("", "end", text=result.split("Music\\")[-1])
+
+    def convert(self):
+        convert(self.get_selected_filename(), self.filetype_entry.get())
 
     def run(self):
         while self.alive:
