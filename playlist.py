@@ -17,10 +17,6 @@ def playlistFromList(files, playlistname, start='', end='', abspath=True, slash=
                 playlist.write(os.path.join(start,os.path.abspath(song),end).replace('\\', slash).replace('/', slash).rstrip(slash)+'\n')#stripping slashes in case end is an empty string
             else:
                 playlist.write(ps.path.join(start,song,end).replace('\\', slash).replace('/', slash).rstrip(slash)+'\n')
-                
+
 if __name__ == '__main__':
     playlist('test files', 'test.m3u')
-    
-                               
-        
-    

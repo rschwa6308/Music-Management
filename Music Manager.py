@@ -10,6 +10,9 @@ from edit import edit
 from search import search
 from covert import convert
 
+import utilities
+import codecs
+
 
 class Manager:
     def __init__(self):
@@ -23,14 +26,15 @@ class Manager:
         self.default_font = font.nametofont("TkDefaultFont").configure(size=12)
 
         self.tag_list = ["title", "artist", "album", "tracknumber", "date"]
+        self.tag_list_keys = ['#t', '#r', '#a', '#n', '#d']
 
         ### File Widget ###
         self.file_widget = ttk.Treeview(self.root)
         self.selected = None
-        self.file_widget.heading("#0", text="C:\\Users\\Russell\\Desktop\\Programming\\Music-Management\\Music", anchor=tk.W)
+        self.file_widget.heading("#0", text=os.path.abspath('Music'), anchor=tk.W)
 
         self.file_list = []
-        self.file_tree = self.build_file_tree("C:\\Users\\Russell\\Desktop\\Programming\\Music-Management\\Music")
+        self.file_tree = self.build_file_tree(os.path.abspath('Music'))
 
         ### Action Widget ###
         self.action_widget = ttk.Notebook(self.root)
@@ -99,6 +103,17 @@ class Manager:
         item_tags = {"title": "", "artist": "", "album": "", "tracknumber": "", "date": ""}
         path = self.get_selected_filename()
         if path and os.path.isfile(path):
+
+            item_tags = EasyID3(path)
+            for tag in self.tag_list:
+                try:
+                    self.tag_entries[tag].delete(0, tk.END) #clears box
+                    self.tag_entries[tag].insert(0, item_tags[tag][0]) #insert into box
+                except:
+                    pass
+        elif path and os.path.isdir(path):
+            for key, tag in zip(self.tag_list_keys, self.tag_list):
+
             try:
                 item_tags = EasyID3(path)
             except:
@@ -106,7 +121,7 @@ class Manager:
         for tag in self.tag_list:
             try:
                 self.tag_entries[tag].delete(0, tk.END)
-                self.tag_entries[tag].insert(0, item_tags[tag][0])
+                self.tag_entries[tag].insert(0, key)
             except:
                 pass
 
@@ -124,13 +139,18 @@ class Manager:
         print("saving!")
         # TODO: Mutagen code to actually write changes
         path = self.get_selected_filename()
-        for key in self.tag_list:
-            edit(self.get_selected_filename(), key, self.tag_entries[key].get())
+        if path and os.path.isfile(path):
+            for key in self.tag_list:
+                edit(path, key, self.tag_entries[key].get())
+        elif path and os.path.isdir(path):
+            for file in utilities.walkMusicFiles(path):
+                for key in self.tag_list:
+                    edit(file, key, self.tag_entries[key].get())
 
     def search(self):
         self.results_list.delete(*self.results_list.get_children())
         keys = [tag for tag in self.tag_list if self.search_checkbutton_vars[tag].get()]
-        results = search(self.search_entry.get(), keys, "C:\\Users\\Russell\\Desktop\\Programming\\Music-Management\\Music")
+        results = search(self.search_entry.get(), keys, os.path.abspath('Music'))
         for result in results:
             self.results_list.insert("", "end", text=result.split("Music\\")[-1])
 
