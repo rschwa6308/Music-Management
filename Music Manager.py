@@ -18,7 +18,7 @@ class Manager:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("Music Manager")    # TODO: choose application name
-        self.root.geometry("1000x800")       # TODO: choose window size
+        self.root.geometry("1100x800")       # TODO: choose window size
 
         self.alive = True
         self.root.protocol('WM_DELETE_WINDOW', self.quit)
@@ -81,6 +81,10 @@ class Manager:
         self.filetype_entry = ttk.Combobox(self.convert_tab, values=[".mp3", ".wav"])
         self.filetype_entry.grid(row=1, column=1)
         ttk.Button(self.convert_tab, text="go", width=8, command=self.convert).grid(row=2, column=0, columnspan=2)
+
+        # Playlist Tab
+        self.playlist_tab = ttk.Frame(self.action_widget)
+        self.action_widget.add(self.playlist_tab, text='Playlists')
 
         # Pack widgets to root
         self.file_widget.pack(expand=1, side=tk.LEFT, fill="both")
