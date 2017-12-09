@@ -1,6 +1,6 @@
 import os
 
-types = ['.mp3', '.wav', '.m4a', '.ogg', '.wma', '.3gp', '.aac', '.aiff', '.flac', '.wma', '.webm', '.mp4'm '.flv', '.mov'] #not entirely comprehensive
+types = ['.mp3', '.wav', '.m4a', '.ogg', '.wma', '.3gp', '.aac', '.aiff', '.flac', '.wma', '.webm', '.mp4' '.flv', '.mov'] #not entirely comprehensive
 
 
 def walk(path):
