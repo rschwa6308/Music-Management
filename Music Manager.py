@@ -15,7 +15,7 @@ class Manager:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("Music Manager")    # TODO: choose application name
-        self.root.geometry("800x600")       # TODO: choose window size
+        self.root.geometry("1000x800")       # TODO: choose window size
 
         self.alive = True
         self.root.protocol('WM_DELETE_WINDOW', self.quit)
@@ -80,7 +80,7 @@ class Manager:
 
         # Pack widgets to root
         self.file_widget.pack(expand=1, side=tk.LEFT, fill="both")
-        self.action_widget.pack(expand=1, side=tk.RIGHT, fill="both")
+        self.action_widget.pack(expand=0, side=tk.RIGHT, fill="both")
 
     def build_file_tree(self, top, parentid=""):
         tree = {top: []}
@@ -99,7 +99,10 @@ class Manager:
         item_tags = {"title": "", "artist": "", "album": "", "tracknumber": "", "date": ""}
         path = self.get_selected_filename()
         if path and os.path.isfile(path):
-            item_tags = EasyID3(path)
+            try:
+                item_tags = EasyID3(path)
+            except:
+                pass
         for tag in self.tag_list:
             try:
                 self.tag_entries[tag].delete(0, tk.END)
