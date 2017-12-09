@@ -1,6 +1,7 @@
 import os
 
-types = ['.mp3', '.wav', '.m4a', '.ogg', '.wma']
+types = ['.mp3', '.wav', '.m4a', '.ogg', '.wma', '.3gp', '.aac', '.aiff', '.flac', '.wma', '.webm', '.mp4'm '.flv', '.mov'] #not entirely comprehensive
+
 
 def walk(path):
     return (os.path.join(root, filename) for root, _, filenames in os.walk(path) for filename in filenames)
