@@ -103,8 +103,10 @@ class Manager:
         item_tags = {"title": "", "artist": "", "album": "", "tracknumber": "", "date": ""}
         path = self.get_selected_filename()
         if path and os.path.isfile(path):
-
-            item_tags = EasyID3(path)
+            try:
+                item_tags = EasyID3(path)
+            except:
+                pass
             for tag in self.tag_list:
                 try:
                     self.tag_entries[tag].delete(0, tk.END) #clears box
@@ -113,17 +115,15 @@ class Manager:
                     pass
         elif path and os.path.isdir(path):
             for key, tag in zip(self.tag_list_keys, self.tag_list):
-
-            try:
-                item_tags = EasyID3(path)
-            except:
-                pass
-        for tag in self.tag_list:
-            try:
-                self.tag_entries[tag].delete(0, tk.END)
-                self.tag_entries[tag].insert(0, key)
-            except:
-                pass
+                try:
+                    item_tags = EasyID3(path)
+                except:
+                    pass
+                try:
+                    self.tag_entries[tag].delete(0, tk.END)
+                    self.tag_entries[tag].insert(0, key)
+                except:
+                    pass
 
         if self.selected:
             print(self.get_selected_filename().split("\\")[-1])
