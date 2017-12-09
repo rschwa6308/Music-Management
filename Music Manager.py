@@ -8,6 +8,7 @@ from pprint import pprint
 
 from edit import edit
 from search import search
+from covert import convert
 
 
 class Manager:
@@ -70,7 +71,12 @@ class Manager:
         # Convert Tab
         self.convert_tab = ttk.Frame(self.action_widget)
         self.action_widget.add(self.convert_tab, text='Convert')
-        self.filename_label = ttk.Label()
+        self.filename_label = tk.Label(self.convert_tab)
+        self.filename_label.grid(row=0, column=0, columnspan=10, sticky=tk.W)
+        tk.Label(self.convert_tab, text="Convert to: ").grid(row=1, column=0)
+        self.filetype_entry = ttk.Combobox(self.convert_tab, values=[".mp3", ".wav"])
+        self.filetype_entry.grid(row=1, column=1)
+        ttk.Button(self.convert_tab, text="go", width=8, command=self.convert).grid(row=2, column=0, columnspan=2)
 
         # Pack widgets to root
         self.file_widget.pack(expand=1, side=tk.LEFT, fill="both")
@@ -101,6 +107,10 @@ class Manager:
             except:
                 pass
 
+        if self.selected:
+            print(self.get_selected_filename().split("\\")[-1])
+            self.filename_label["text"] = self.get_selected_filename().split("\\")[-1]
+
     def get_selected_filename(self):
         if len(self.selected) == 1:
             for id, path in self.file_list:
@@ -120,6 +130,9 @@ class Manager:
         results = search(self.search_entry.get(), keys, "C:\\Users\\Russell\\Desktop\\Programming\\Music-Management\\Music")
         for result in results:
             self.results_list.insert("", "end", text=result.split("Music\\")[-1])
+
+    def convert(self):
+        convert(self.get_selected_filename(), self.filetype_entry.get())
 
     def run(self):
         while self.alive:
