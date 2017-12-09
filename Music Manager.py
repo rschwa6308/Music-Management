@@ -6,6 +6,8 @@ import os
 from mutagen.easyid3 import EasyID3
 from pprint import pprint
 
+from edit import edit
+
 
 class Manager:
     def __init__(self):
@@ -18,7 +20,7 @@ class Manager:
 
         self.default_font = font.nametofont("TkDefaultFont").configure(size=12)
 
-        self.tag_list = ["title", "artist", "album", "track #", "date"]
+        self.tag_list = ["title", "artist", "album", "tracknumber", "date"]
 
         ### File Widget ###
         self.file_widget = ttk.Treeview(self.root)
@@ -79,27 +81,29 @@ class Manager:
         return tree
 
     def update_action_widget(self):
-        item_tags = {"title": "", "artist": "", "album": "", "track #": "", "date": ""}
-        if len(self.selected) == 1:
-            for id, path in self.file_list:
-                if id == self.selected[0]:
-                    if os.path.isfile(path):
-                        try:
-                            item_tags = EasyID3(path)
-                            print(item_tags)
-                        except:
-                            pass
+        item_tags = {"title": "", "artist": "", "album": "", "tracknumber": "", "date": ""}
+        path = self.get_selected_filename()
+        if path and os.path.isfile(path):
+            item_tags = EasyID3(path)
         for tag in self.tag_list:
-
             try:
                 self.tag_entries[tag].delete(0, tk.END)
                 self.tag_entries[tag].insert(0, item_tags[tag][0])
             except:
                 pass
 
+    def get_selected_filename(self):
+        if len(self.selected) == 1:
+            for id, path in self.file_list:
+                if id == self.selected[0]:
+                    return path
+
     def save(self):
         print("saving!")
         # TODO: Mutagen code to actually write changes
+        path = self.get_selected_filename()
+        for key in self.tag_list:
+            edit(self.get_selected_filename(), key, self.tag_entries[key].get())
 
     def search(self):
         print("searching!")
