@@ -21,3 +21,5 @@ def edit(filename, key, value):
     songdata[key] = value
     songdata.save()
         
+if __name__ == '__main__':
+    edit('test files\\2-01 Barbara Allen.mp3', 'title', '222#f')
