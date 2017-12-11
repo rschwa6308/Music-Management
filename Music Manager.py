@@ -29,12 +29,14 @@ class Manager:
         self.tag_list_keys = ['#t', '#r', '#a', '#n', '#d']
 
         ### File Widget ###
+        self.library = "E:\Music"
+
         self.file_widget = ttk.Treeview(self.root)
         self.selected = None
-        self.file_widget.heading("#0", text=os.path.abspath('Music'), anchor=tk.W)
+        self.file_widget.heading("#0", text=self.library, anchor=tk.W)
 
         self.file_list = []
-        self.file_tree = self.build_file_tree(os.path.abspath('Music'))
+        self.file_tree = self.build_file_tree(self.library)
 
         ### Action Widget ###
         self.action_widget = ttk.Notebook(self.root)
@@ -154,9 +156,9 @@ class Manager:
     def search(self):
         self.results_list.delete(*self.results_list.get_children())
         keys = [tag for tag in self.tag_list if self.search_checkbutton_vars[tag].get()]
-        results = search(self.search_entry.get(), keys, os.path.abspath('Music'))
+        results = search(self.search_entry.get(), keys, self.library)
         for result in results:
-            self.results_list.insert("", "end", text=result.split("Music\\")[-1])
+            self.results_list.insert("", "end", text=result.split(self.library + "\\")[-1])
 
     def convert(self):
         convert(self.get_selected_filename(), self.filetype_entry.get())

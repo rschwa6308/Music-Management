@@ -6,6 +6,8 @@ import os
 A generator
 Takes a list of dictionary keys for the mutagen.File dictionary
 '''
+
+
 def search(term, keys, path):
     for key in keys:
         yield from searchHelper(term, key, path)
