@@ -132,7 +132,7 @@ class Manager:
                     pass
 
         if self.selected:
-            print(self.get_selected_filename().split("\\")[-1])
+            # print(self.get_selected_filename().split("\\")[-1])
             self.filename_label["text"] = self.get_selected_filename().split("\\")[-1]
 
     def get_selected_filename(self):
@@ -142,7 +142,7 @@ class Manager:
                     return path
 
     def save(self):
-        print("saving!")
+        # print("saving!")
         # TODO: Mutagen code to actually write changes
         path = self.get_selected_filename()
         if path and os.path.isfile(path):

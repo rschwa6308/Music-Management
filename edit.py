@@ -25,7 +25,7 @@ def edit(filename, key, value):
             value = value.replace(k, songdata[v][0])
         except KeyError:
             value = value.replace(k, "")
-    print(key + ": " + value)
+    # print(key + ": " + value)
     songdata[key] = value
     songdata.save()
 
