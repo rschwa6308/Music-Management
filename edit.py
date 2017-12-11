@@ -24,7 +24,8 @@ def edit(filename, key, value):
         try:
             value = value.replace(k, songdata[v][0])
         except KeyError:
-            pass  # if particular file does not have that metadata
+            value = value.replace(k, "")
+    print(key + ": " + value)
     songdata[key] = value
     songdata.save()
 
