@@ -1,7 +1,9 @@
 import tkinter as tk
 from tkinter import font
 from tkinter import ttk
+from PIL import ImageTk
 import os
+import pygame.mixer
 
 from mutagen.easyid3 import EasyID3
 from pprint import pprint
@@ -41,15 +43,10 @@ class Manager:
         ### Action Widget ###
         self.action_widget = ttk.Notebook(self.root)
 
-        # Edit Tab
-        self.metadata_tab = ttk.Frame(self.action_widget)
-        self.action_widget.add(self.metadata_tab, text='Edit')
-        self.tag_entries = {tag: ttk.Entry(self.metadata_tab, width=35) for tag in self.tag_list}
-        for i, tag in enumerate(self.tag_list):
-            ttk.Label(self.metadata_tab, text=tag.title()).grid(row=i, sticky=tk.W)
-            self.tag_entries[tag].grid(row=i, column=1, sticky=tk.W)
-
-        ttk.Button(self.metadata_tab, text="Save", command=self.save).grid(row=6, columnspan=2, sticky=tk.S)
+        # Play Tab
+        self.play_tab = ttk.Frame(self.action_widget)
+        self.action_widget.add(self.play_tab, text='Play')
+        # ttk.Button(text=)
 
         # Search Tab
         self.search_tab = ttk.Frame(self.action_widget)
@@ -63,7 +60,9 @@ class Manager:
         tk.Label(self.search_tab, text="", width=60).grid(row=0, column=3)
 
         self.search_checkbutton_vars = {tag: tk.IntVar() for tag in self.tag_list}
-        self.search_checkbuttons = {tag: tk.Checkbutton(self.search_tab, text=tag, variable=self.search_checkbutton_vars[tag]) for tag in self.tag_list}
+        self.search_checkbuttons = {
+        tag: tk.Checkbutton(self.search_tab, text=tag, variable=self.search_checkbutton_vars[tag]) for tag in
+        self.tag_list}
         for i, checkbutton in enumerate(list(self.search_checkbuttons.values())[:3]):
             checkbutton.deselect()
             checkbutton.grid(row=1 + i, column=0, sticky=tk.W)
@@ -72,7 +71,17 @@ class Manager:
             checkbutton.grid(row=1 + i, column=1, sticky=tk.W)
 
         self.results_list = ttk.Treeview(self.search_tab)
-        self.results_list.grid(row=4, column=0, columnspan=4, sticky=tk.W+tk.E+tk.N+tk.S)
+        self.results_list.grid(row=4, column=0, columnspan=4, sticky=tk.W + tk.E + tk.N + tk.S)
+
+        # Edit Tab
+        self.metadata_tab = ttk.Frame(self.action_widget)
+        self.action_widget.add(self.metadata_tab, text='Edit')
+        self.tag_entries = {tag: ttk.Entry(self.metadata_tab, width=35) for tag in self.tag_list}
+        for i, tag in enumerate(self.tag_list):
+            ttk.Label(self.metadata_tab, text=tag.title()).grid(row=i, sticky=tk.W)
+            self.tag_entries[tag].grid(row=i, column=1, sticky=tk.W)
+
+        ttk.Button(self.metadata_tab, text="Save", command=self.save).grid(row=6, columnspan=2, sticky=tk.S)
 
         # Convert Tab
         self.convert_tab = ttk.Frame(self.action_widget)
