@@ -46,13 +46,16 @@ class Manager:
         pygame.mixer.init()  # initialize music mixer
         self.playing = False
 
+        self.album_art = ImageTk.PhotoImage(Image.open("Assets/musical notes.png"))
         self.play_image = ImageTk.PhotoImage(Image.open("Assets/play.png"))
         self.pause_image = ImageTk.PhotoImage(Image.open("Assets/pause.png"))
 
-        self.play_button = ttk.Button(self.play_tab, image=self.play_image, command=self.play_toggle)
-        self.play_button.image = self.play_image
-        self.play_button.grid(row=1, column=1)
-
+        self.album_art_label = ttk.Label(self.play_tab, image=self.album_art)
+        self.album_art_label.pack() # grid(row=0, column=0, columnspan=3)
+        self.title_label = ttk.Label(self.play_tab, font=("Helvetica", 18))
+        self.title_label.pack()
+        self.play_button = tk.Button(self.play_tab, image=self.play_image, bd=0, command=self.play_toggle)
+        self.play_button.pack() # grid(row=1, column=1)
 
         # Search Tab
         self.search_tab = ttk.Frame(self.action_widget)
@@ -121,12 +124,6 @@ class Manager:
         return tree
 
     def update_action_widget(self):
-        # Play Tab
-        if self.playing:
-            self.play_button["image"] = self.pause_image
-        else:
-            self.play_button["image"] = self.play_image
-
         # Edit Tab
         item_tags = {"title": "", "artist": "", "album": "", "tracknumber": "", "date": ""}
         path = self.get_selected_filename()
@@ -144,10 +141,6 @@ class Manager:
         elif path and os.path.isdir(path):
             for key, tag in zip(self.tag_list_keys, self.tag_list):
                 try:
-                    item_tags = EasyID3(path)
-                except:
-                    pass
-                try:
                     self.tag_entries[tag].delete(0, tk.END)
                     self.tag_entries[tag].insert(0, key)
                 except:
@@ -156,6 +149,26 @@ class Manager:
         if self.selected:
             # print(self.get_selected_filename().split("\\")[-1])
             self.filename_label["text"] = self.get_selected_filename().split("\\")[-1]
+
+        # Play Tab
+        if self.playing:
+            self.play_button["image"] = self.pause_image
+        else:
+            self.play_button["image"] = self.play_image
+
+        if not self.playing:
+            if path:
+                self.play_button["state"] = "normal"
+            else:
+                self.play_button["state"] = "disabled"
+
+        if path:
+            try:
+                self.title_label["text"] = "\"" + item_tags["title"][0] + "\"" + ", by " + item_tags["artist"][0]
+            except:
+                pass
+        else:
+            self.title_label["text"] = ""
 
 
     def get_selected_filename(self):
