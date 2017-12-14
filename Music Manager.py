@@ -168,7 +168,7 @@ class Manager:
         path = self.get_selected_filename()
         if path:
             if self.playing:
-                pygame.mixer.music.stop()
+                pygame.mixer.music.pause()
             else:
                 if os.path.isfile(path):
                     pygame.mixer.music.load(path)
