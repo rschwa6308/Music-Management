@@ -1,26 +1,22 @@
 import tkinter as tk
 from tkinter import font
 from tkinter import ttk
-from PIL import ImageTk
 import os
 import pygame.mixer
-
 from mutagen.easyid3 import EasyID3
-from pprint import pprint
+from PIL import Image, ImageTk
 
 from edit import edit
 from search import search
 from covert import convert
-
 import utilities
-import codecs
 
 
 class Manager:
     def __init__(self):
         self.root = tk.Tk()
-        self.root.title("Music Manager")    # TODO: choose application name
-        self.root.geometry("1100x800")       # TODO: choose window size
+        self.root.title("Music Manager")  # TODO: choose application name
+        self.root.geometry("1100x800")  # TODO: choose window size
 
         self.alive = True
         self.root.protocol('WM_DELETE_WINDOW', self.quit)
@@ -46,7 +42,17 @@ class Manager:
         # Play Tab
         self.play_tab = ttk.Frame(self.action_widget)
         self.action_widget.add(self.play_tab, text='Play')
-        # ttk.Button(text=)
+
+        pygame.mixer.init()  # initialize music mixer
+        self.playing = False
+
+        self.play_image = ImageTk.PhotoImage(Image.open("Assets/play.png"))
+        self.pause_image = ImageTk.PhotoImage(Image.open("Assets/pause.png"))
+
+        self.play_button = ttk.Button(self.play_tab, image=self.play_image, command=self.play_toggle)
+        self.play_button.image = self.play_image
+        self.play_button.grid(row=1, column=1)
+
 
         # Search Tab
         self.search_tab = ttk.Frame(self.action_widget)
@@ -61,8 +67,8 @@ class Manager:
 
         self.search_checkbutton_vars = {tag: tk.IntVar() for tag in self.tag_list}
         self.search_checkbuttons = {
-        tag: tk.Checkbutton(self.search_tab, text=tag, variable=self.search_checkbutton_vars[tag]) for tag in
-        self.tag_list}
+            tag: tk.Checkbutton(self.search_tab, text=tag, variable=self.search_checkbutton_vars[tag]) for tag in
+            self.tag_list}
         for i, checkbutton in enumerate(list(self.search_checkbuttons.values())[:3]):
             checkbutton.deselect()
             checkbutton.grid(row=1 + i, column=0, sticky=tk.W)
@@ -115,6 +121,13 @@ class Manager:
         return tree
 
     def update_action_widget(self):
+        # Play Tab
+        if self.playing:
+            self.play_button["image"] = self.pause_image
+        else:
+            self.play_button["image"] = self.play_image
+
+        # Edit Tab
         item_tags = {"title": "", "artist": "", "album": "", "tracknumber": "", "date": ""}
         path = self.get_selected_filename()
         if path and os.path.isfile(path):
@@ -124,8 +137,8 @@ class Manager:
                 pass
             for tag in self.tag_list:
                 try:
-                    self.tag_entries[tag].delete(0, tk.END) #clears box
-                    self.tag_entries[tag].insert(0, item_tags[tag][0]) #insert into box
+                    self.tag_entries[tag].delete(0, tk.END)  # clears box
+                    self.tag_entries[tag].insert(0, item_tags[tag][0])  # insert into box
                 except:
                     pass
         elif path and os.path.isdir(path):
@@ -144,15 +157,29 @@ class Manager:
             # print(self.get_selected_filename().split("\\")[-1])
             self.filename_label["text"] = self.get_selected_filename().split("\\")[-1]
 
+
     def get_selected_filename(self):
         if len(self.selected) == 1:
             for id, path in self.file_list:
                 if id == self.selected[0]:
                     return path
 
+    def play_toggle(self):
+        path = self.get_selected_filename()
+        if path:
+            if self.playing:
+                pygame.mixer.music.stop()
+            else:
+                if os.path.isfile(path):
+                    pygame.mixer.music.load(path)
+                    pygame.mixer.music.play()
+                elif os.path.isdir(path):
+                    pass
+            self.playing = not self.playing
+            self.update_action_widget()
+
     def save(self):
         # print("saving!")
-        # TODO: Mutagen code to actually write changes
         path = self.get_selected_filename()
         if path and os.path.isfile(path):
             for key in self.tag_list:
