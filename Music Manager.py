@@ -1,15 +1,16 @@
+import os
 import tkinter as tk
 from tkinter import font
 from tkinter import ttk
-import os
-import pygame.mixer
-from mutagen.easyid3 import EasyID3
-from PIL import Image, ImageTk
 
+import pygame.mixer
+from PIL import Image, ImageTk
+from mutagen.easyid3 import EasyID3
+
+import utilities
+from covert import convert
 from edit import edit
 from search import search
-from covert import convert
-import utilities
 
 
 class Manager:
@@ -45,13 +46,17 @@ class Manager:
 
         pygame.mixer.init()  # initialize music mixer
         self.playing = False
+        self.current_song = None
 
-        self.album_art = ImageTk.PhotoImage(Image.open("Assets/musical notes.png"))
+        # self.album_art = ImageTk.PhotoImage(Image.open("Assets/musical notes.png"))
         self.play_image = ImageTk.PhotoImage(Image.open("Assets/play.png"))
         self.pause_image = ImageTk.PhotoImage(Image.open("Assets/pause.png"))
 
-        self.album_art_label = ttk.Label(self.play_tab, image=self.album_art)
-        self.album_art_label.pack() # grid(row=0, column=0, columnspan=3)
+        # self.album_art_label = ttk.Label(self.play_tab, image=self.album_art)
+        # self.album_art_label.pack() # grid(row=0, column=0, columnspan=3)
+        self.song_queue = ttk.Treeview(self.play_tab)
+        self.song_queue.column("#0", stretch=True)
+        self.song_queue.pack(fill=tk.BOTH)
         self.title_label = ttk.Label(self.play_tab, font=("Helvetica", 18))
         self.title_label.pack()
         self.play_button = tk.Button(self.play_tab, image=self.play_image, bd=0, command=self.play_toggle)
@@ -146,11 +151,15 @@ class Manager:
                 except:
                     pass
 
-        if self.selected:
+        if path:
             # print(self.get_selected_filename().split("\\")[-1])
             self.filename_label["text"] = self.get_selected_filename().split("\\")[-1]
 
         # Play Tab
+        self.song_queue.delete(*self.song_queue.get_children())
+        for item in self.file_widget.selection():
+            self.song_queue.insert("", "end", text=self.file_widget.item(item, option="text"))
+
         if self.playing:
             self.play_button["image"] = self.pause_image
         else:
@@ -170,7 +179,6 @@ class Manager:
         else:
             self.title_label["text"] = ""
 
-
     def get_selected_filename(self):
         if len(self.selected) == 1:
             for id, path in self.file_list:
@@ -184,8 +192,12 @@ class Manager:
                 pygame.mixer.music.pause()
             else:
                 if os.path.isfile(path):
-                    pygame.mixer.music.load(path)
-                    pygame.mixer.music.play()
+                    if path == self.current_song:
+                        pygame.mixer.music.unpause()
+                    else:
+                        self.current_song = path
+                        pygame.mixer.music.load(path)
+                        pygame.mixer.music.play()
                 elif os.path.isdir(path):
                     pass
             self.playing = not self.playing
