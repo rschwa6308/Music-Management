@@ -47,6 +47,7 @@ class Manager:
         pygame.mixer.init()  # initialize music mixer
         self.playing = False
         self.current_song = None
+        self.queue_index = 0
 
         # self.album_art = ImageTk.PhotoImage(Image.open("Assets/musical notes.png"))
         self.play_image = ImageTk.PhotoImage(Image.open("Assets/play.png"))
@@ -158,8 +159,20 @@ class Manager:
         # Play Tab
         self.song_queue.delete(*self.song_queue.get_children())
         for item in self.file_widget.selection():
-            self.song_queue.insert("", "end", text=self.file_widget.item(item, option="text"))
+            print(item)
+            if os.path.isfile(self.get_filename(item)):
+                self.song_queue.insert("", "end", text=self.file_widget.item(item, option="text"), iid=item)
+            else:
+                for child in self.file_widget.get_children(item):
+                    self.song_queue.insert("", "end", text=self.file_widget.item(child, option="text"), iid=child)
 
+        if len(self.song_queue.get_children()) > 0:
+            current_item = self.song_queue.get_children()[self.queue_index]
+            self.song_queue.selection_set(current_item)
+            
+
+
+        path = self.get_queued_filename()
         if self.playing:
             self.play_button["image"] = self.pause_image
         else:
@@ -179,29 +192,38 @@ class Manager:
         else:
             self.title_label["text"] = ""
 
+    def get_filename(self, iid):
+        for id, path in self.file_list:
+            if id == iid:
+                return path
+
     def get_selected_filename(self):
         if len(self.selected) == 1:
             for id, path in self.file_list:
                 if id == self.selected[0]:
                     return path
 
+    def get_queued_filename(self):
+        if len(self.song_queue.get_children()) == 0:
+            return None
+        item = self.song_queue.get_children()[self.queue_index]
+        return self.get_filename(item)
+
     def play_toggle(self):
-        path = self.get_selected_filename()
-        if path:
-            if self.playing:
-                pygame.mixer.music.pause()
-            else:
-                if os.path.isfile(path):
-                    if path == self.current_song:
-                        pygame.mixer.music.unpause()
-                    else:
-                        self.current_song = path
-                        pygame.mixer.music.load(path)
-                        pygame.mixer.music.play()
-                elif os.path.isdir(path):
-                    pass
-            self.playing = not self.playing
-            self.update_action_widget()
+        if self.playing:
+            pygame.mixer.music.pause()
+        else:
+            path = self.get_queued_filename()
+            if path:
+                if self.current_song == path:
+                    pygame.mixer.music.unpause()
+                else:
+                    self.current_song = path
+                    pygame.mixer.music.load(path)
+                    pygame.mixer.music.play()
+
+        self.playing = not self.playing
+        self.update_action_widget()
 
     def save(self):
         # print("saving!")
