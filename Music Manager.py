@@ -169,7 +169,7 @@ class Manager:
         if len(self.song_queue.get_children()) > 0:
             current_item = self.song_queue.get_children()[self.queue_index]
             self.song_queue.selection_set(current_item)
-            
+
 
 
         path = self.get_queued_filename()
@@ -218,9 +218,12 @@ class Manager:
                 if self.current_song == path:
                     pygame.mixer.music.unpause()
                 else:
-                    self.current_song = path
-                    pygame.mixer.music.load(path)
-                    pygame.mixer.music.play()
+                    try:
+                        pygame.mixer.music.load(path)
+                        pygame.mixer.music.play()
+                        self.current_song = path
+                    except:
+                        pass
 
         self.playing = not self.playing
         self.update_action_widget()
