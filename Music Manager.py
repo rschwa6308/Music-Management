@@ -57,7 +57,7 @@ class Manager:
 
         # self.album_art_label = ttk.Label(self.play_tab, image=self.album_art)
         # self.album_art_label.pack() # grid(row=0, column=0, columnspan=3)
-        self.song_queue = ttk.Treeview(self.play_tab)
+        self.song_queue = ttk.Treeview(self.play_tab, height=30)
         self.song_queue.column("#0", stretch=True)
         self.song_queue.pack(fill=tk.BOTH)
         self.title_label = ttk.Label(self.play_tab, font=("Helvetica", 18))
@@ -71,7 +71,6 @@ class Manager:
         self.next_button = tk.Button(song_button_frame, image=self.next_image, bd=0, command=self.next_song)
         self.next_button.pack(side=tk.LEFT)
         song_button_frame.pack()
-
 
         # Search Tab
         self.search_tab = ttk.Frame(self.action_widget)
@@ -170,7 +169,6 @@ class Manager:
         # update song queue
         self.song_queue.delete(*self.song_queue.get_children())
         for item in self.file_widget.selection():
-            print(item)
             if os.path.isfile(self.get_filename(item)):
                 if item not in self.song_queue.get_children():
                     self.song_queue.insert("", "end", text=self.file_widget.item(item, option="text"), iid=item)
@@ -202,7 +200,6 @@ class Manager:
 
         # disables << and >> buttons at start and end of queue TODO: consider wrapping
         if path:
-            print(self.queue_index)
             if self.queue_index == 0:
                 self.back_button["state"] = "disabled"
             else:
@@ -215,6 +212,11 @@ class Manager:
 
         # update song info label
         if path:
+            if os.path.isfile(path):
+                try:
+                    item_tags = EasyID3(path)
+                except:
+                    pass
             try:
                 self.title_label["text"] = "\"" + item_tags["title"][0] + "\"" + ", by " + item_tags["artist"][0]
             except:
@@ -236,7 +238,7 @@ class Manager:
     def get_queued_filename(self):
         if len(self.song_queue.get_children()) == 0:
             return None
-        item = self.song_queue.get_children()[self.queue_index]
+        item = self.song_queue.selection()[0] # self.song_queue.get_children()[self.queue_index]
         return self.get_filename(item)
 
     def play_toggle(self):
@@ -244,6 +246,7 @@ class Manager:
             pygame.mixer.music.pause()
         else:
             path = self.get_queued_filename()
+            print(path)
             if path:
                 if self.current_song == path:
                     pygame.mixer.music.unpause()
@@ -261,14 +264,14 @@ class Manager:
     def back_song(self):
         self.play_toggle()
         self.queue_index -= 1
-        self.play_toggle()
         self.update_action_widget()
+        self.play_toggle()
 
     def next_song(self):
         self.play_toggle()
         self.queue_index += 1
-        self.play_toggle()
         self.update_action_widget()
+        self.play_toggle()
 
     def save(self):
         # print("saving!")
@@ -293,8 +296,11 @@ class Manager:
 
     def run(self):
         while self.alive:
-            if self.file_widget.selection() != self.selected:
+            if self.file_widget.selection() != self.selected or self.current_song != self.get_queued_filename():
                 self.selected = self.file_widget.selection()
+                # self.current_song = self.get_queued_filename()
+                if len(self.song_queue.get_children()) != 0:
+                    self.queue_index = self.song_queue.get_children().index(self.song_queue.selection()[0])
                 self.update_action_widget()
             self.root.update()
 
