@@ -179,6 +179,8 @@ class Manager:
 
         if len(self.song_queue.get_children()) > 0:
             # highlight item item dictated by the queue index
+            if self.queue_index >= len(self.song_queue.get_children()):
+                self.queue_index = 0
             current_item = self.song_queue.get_children()[self.queue_index]
             self.song_queue.selection_set(current_item)
 
