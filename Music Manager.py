@@ -52,6 +52,8 @@ class Manager:
         # self.album_art = ImageTk.PhotoImage(Image.open("Assets/musical notes.png"))
         self.play_image = ImageTk.PhotoImage(Image.open("Assets/play.png"))
         self.pause_image = ImageTk.PhotoImage(Image.open("Assets/pause.png"))
+        self.back_image = ImageTk.PhotoImage(Image.open("Assets/previous.png"))
+        self.next_image = ImageTk.PhotoImage(Image.open("Assets/next.png"))
 
         # self.album_art_label = ttk.Label(self.play_tab, image=self.album_art)
         # self.album_art_label.pack() # grid(row=0, column=0, columnspan=3)
@@ -60,8 +62,16 @@ class Manager:
         self.song_queue.pack(fill=tk.BOTH)
         self.title_label = ttk.Label(self.play_tab, font=("Helvetica", 18))
         self.title_label.pack()
-        self.play_button = tk.Button(self.play_tab, image=self.play_image, bd=0, command=self.play_toggle)
-        self.play_button.pack() # grid(row=1, column=1)
+
+        song_button_frame = tk.Frame(self.play_tab)
+        self.back_button = tk.Button(song_button_frame, image=self.back_image, bd=0, command=self.back_song)
+        self.back_button.pack(side=tk.LEFT)
+        self.play_button = tk.Button(song_button_frame, image=self.play_image, bd=0, command=self.play_toggle)
+        self.play_button.pack(side=tk.LEFT)
+        self.next_button = tk.Button(song_button_frame, image=self.next_image, bd=0, command=self.next_song)
+        self.next_button.pack(side=tk.LEFT)
+        song_button_frame.pack()
+
 
         # Search Tab
         self.search_tab = ttk.Frame(self.action_widget)
@@ -157,11 +167,13 @@ class Manager:
             self.filename_label["text"] = self.get_selected_filename().split("\\")[-1]
 
         # Play Tab
+        # update song queue
         self.song_queue.delete(*self.song_queue.get_children())
         for item in self.file_widget.selection():
             print(item)
             if os.path.isfile(self.get_filename(item)):
-                self.song_queue.insert("", "end", text=self.file_widget.item(item, option="text"), iid=item)
+                if item not in self.song_queue.get_children():
+                    self.song_queue.insert("", "end", text=self.file_widget.item(item, option="text"), iid=item)
             else:
                 for child in self.file_widget.get_children(item):
                     self.song_queue.insert("", "end", text=self.file_widget.item(child, option="text"), iid=child)
@@ -170,20 +182,38 @@ class Manager:
             current_item = self.song_queue.get_children()[self.queue_index]
             self.song_queue.selection_set(current_item)
 
-
-
+        # toggle play/pause image
         path = self.get_queued_filename()
         if self.playing:
             self.play_button["image"] = self.pause_image
         else:
             self.play_button["image"] = self.play_image
 
+        # diables play button when queue is empty
         if not self.playing:
             if path:
                 self.play_button["state"] = "normal"
+                self.back_button["state"] = "normal"
+                self.next_button["state"] = "normal"
             else:
                 self.play_button["state"] = "disabled"
+                self.back_button["state"] = "disabled"
+                self.next_button["state"] = "disabled"
 
+        # disables << and >> buttons at start and end of queue TODO: consider wrapping
+        if path:
+            print(self.queue_index)
+            if self.queue_index == 0:
+                self.back_button["state"] = "disabled"
+            else:
+                self.back_button["state"] = "normal"
+
+            if self.queue_index == len(self.song_queue.get_children()) - 1:
+                self.next_button["state"] = "disabled"
+            else:
+                self.next_button["state"] = "normal"
+
+        # update song info label
         if path:
             try:
                 self.title_label["text"] = "\"" + item_tags["title"][0] + "\"" + ", by " + item_tags["artist"][0]
@@ -226,6 +256,18 @@ class Manager:
                         pass
 
         self.playing = not self.playing
+        self.update_action_widget()
+
+    def back_song(self):
+        self.play_toggle()
+        self.queue_index -= 1
+        self.play_toggle()
+        self.update_action_widget()
+
+    def next_song(self):
+        self.play_toggle()
+        self.queue_index += 1
+        self.play_toggle()
         self.update_action_widget()
 
     def save(self):
