@@ -1,5 +1,4 @@
-import utilities
-import mutagen
+import Helpers.utilities as utilities
 from mutagen.easyid3 import EasyID3
 import os
 '''

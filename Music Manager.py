@@ -7,10 +7,11 @@ import pygame.mixer
 from PIL import Image, ImageTk
 from mutagen.easyid3 import EasyID3
 
-import utilities
-from covert import convert
-from edit import edit
-from search import search
+from Helpers.utilities import *
+from Helpers.covert import *
+from Helpers.edit import *
+from Helpers.search import *
+# from Helpers import *
 
 
 class Manager:

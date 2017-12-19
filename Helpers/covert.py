@@ -1,6 +1,5 @@
 import os
-import utilities
-from utilities import types
+import Helpers.utilities as utilities
 import subprocess
 
 commandline = lambda x: subprocess.call(x, shell=True)
