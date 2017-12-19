@@ -48,6 +48,7 @@ class Manager:
         self.playing = False
         self.current_song = None
         self.queue_index = 0
+        self.queued_song = None
 
         # self.album_art = ImageTk.PhotoImage(Image.open("Assets/musical notes.png"))
         self.play_image = ImageTk.PhotoImage(Image.open("Assets/play.png"))
@@ -57,7 +58,7 @@ class Manager:
 
         # self.album_art_label = ttk.Label(self.play_tab, image=self.album_art)
         # self.album_art_label.pack() # grid(row=0, column=0, columnspan=3)
-        self.song_queue = ttk.Treeview(self.play_tab, height=30)
+        self.song_queue = ttk.Treeview(self.play_tab, height=10, selectmode="browse")
         self.song_queue.column("#0", stretch=True)
         self.song_queue.pack(fill=tk.BOTH)
         self.title_label = ttk.Label(self.play_tab, font=("Helvetica", 18))
@@ -177,8 +178,12 @@ class Manager:
                     self.song_queue.insert("", "end", text=self.file_widget.item(child, option="text"), iid=child)
 
         if len(self.song_queue.get_children()) > 0:
+            # highlight item item dictated by the queue index
             current_item = self.song_queue.get_children()[self.queue_index]
             self.song_queue.selection_set(current_item)
+            # resize queue widget as needed
+            # self.song_queue.config(height=50)
+            # TODO: figure out how to dynamicallt resize the song_queue Treeview
 
         # toggle play/pause image
         path = self.get_queued_filename()
@@ -187,7 +192,7 @@ class Manager:
         else:
             self.play_button["image"] = self.play_image
 
-        # diables play button when queue is empty
+        # disables play button when queue is empty
         if not self.playing:
             if path:
                 self.play_button["state"] = "normal"
@@ -246,7 +251,6 @@ class Manager:
             pygame.mixer.music.pause()
         else:
             path = self.get_queued_filename()
-            print(path)
             if path:
                 if self.current_song == path:
                     pygame.mixer.music.unpause()
@@ -296,9 +300,10 @@ class Manager:
 
     def run(self):
         while self.alive:
-            if self.file_widget.selection() != self.selected or self.current_song != self.get_queued_filename():
+            if self.file_widget.selection() != self.selected or self.queued_song != self.get_queued_filename():
+                # print("update")
                 self.selected = self.file_widget.selection()
-                # self.current_song = self.get_queued_filename()
+                self.queued_song = self.get_queued_filename()
                 if len(self.song_queue.get_children()) != 0:
                     self.queue_index = self.song_queue.get_children().index(self.song_queue.selection()[0])
                 self.update_action_widget()
