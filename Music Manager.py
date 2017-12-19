@@ -59,9 +59,9 @@ class Manager:
         # self.album_art_label.pack() # grid(row=0, column=0, columnspan=3)
         self.song_queue = ttk.Treeview(self.play_tab, height=10, selectmode="browse")
         self.song_queue.column("#0", stretch=True)
-        self.song_queue.pack(fill=tk.BOTH, expand=True)
+        self.song_queue.pack(fill=tk.BOTH, expand=True, pady=5, padx=5)
         self.title_label = ttk.Label(self.play_tab, font=("Helvetica", 18))
-        self.title_label.pack(pady=20)
+        self.title_label.pack(pady=15)
 
         song_button_frame = tk.Frame(self.play_tab)
         self.back_button = tk.Button(song_button_frame, image=self.back_image, bd=0, command=self.back_song)
@@ -70,7 +70,7 @@ class Manager:
         self.play_button.pack(side=tk.LEFT)
         self.next_button = tk.Button(song_button_frame, image=self.next_image, bd=0, command=self.next_song)
         self.next_button.pack(side=tk.LEFT)
-        song_button_frame.pack()
+        song_button_frame.pack(pady=10)
 
         # Search Tab
         self.search_tab = ttk.Frame(self.action_widget)
