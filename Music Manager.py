@@ -5,13 +5,11 @@ from tkinter import ttk
 
 import pygame.mixer
 from PIL import Image, ImageTk
-from mutagen.easyid3 import EasyID3
+# from mutagen.easyid3 import EasyID3
 
-from Helpers.utilities import *
 from Helpers.covert import *
 from Helpers.edit import *
 from Helpers.search import *
-# from Helpers import *
 
 
 class Manager:
@@ -78,16 +76,17 @@ class Manager:
         self.search_tab = ttk.Frame(self.action_widget)
         self.action_widget.add(self.search_tab, text='Search')
 
-        self.search_entry = ttk.Entry(self.search_tab, font=("Arial", 12))
+        search_entry_frame = tk.Frame(self.search_tab)
+        self.search_entry = ttk.Entry(search_entry_frame, font=("Arial", 12))
         self.search_entry.grid(row=0, column=0, columnspan=2)
-        self.submit_button = ttk.Button(self.search_tab, text="go", command=self.search, width=3)
+        self.submit_button = ttk.Button(search_entry_frame, text="go", command=self.search, width=3)
         self.submit_button.grid(row=0, column=2)
 
-        tk.Label(self.search_tab, text="", width=60).grid(row=0, column=3)
+        tk.Label(search_entry_frame, text="", width=60).grid(row=0, column=3)
 
         self.search_checkbutton_vars = {tag: tk.IntVar() for tag in self.tag_list}
         self.search_checkbuttons = {
-            tag: tk.Checkbutton(self.search_tab, text=tag, variable=self.search_checkbutton_vars[tag]) for tag in
+            tag: tk.Checkbutton(search_entry_frame, text=tag, variable=self.search_checkbutton_vars[tag]) for tag in
             self.tag_list}
         for i, checkbutton in enumerate(list(self.search_checkbuttons.values())[:3]):
             checkbutton.deselect()
@@ -95,9 +94,10 @@ class Manager:
         for i, checkbutton in enumerate(list(self.search_checkbuttons.values())[3:]):
             checkbutton.deselect()
             checkbutton.grid(row=1 + i, column=1, sticky=tk.W)
+        search_entry_frame.pack()
 
         self.results_list = ttk.Treeview(self.search_tab)
-        self.results_list.grid(row=4, column=0, columnspan=4, sticky=tk.W + tk.E + tk.N + tk.S)
+        self.results_list.pack(fill=tk.BOTH, expand=True, pady=5, padx=5)
 
         # Edit Tab
         self.metadata_tab = ttk.Frame(self.action_widget)
