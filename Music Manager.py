@@ -60,9 +60,9 @@ class Manager:
         # self.album_art_label.pack() # grid(row=0, column=0, columnspan=3)
         self.song_queue = ttk.Treeview(self.play_tab, height=10, selectmode="browse")
         self.song_queue.column("#0", stretch=True)
-        self.song_queue.pack(fill=tk.BOTH)
+        self.song_queue.pack(fill=tk.BOTH, expand=True)
         self.title_label = ttk.Label(self.play_tab, font=("Helvetica", 18))
-        self.title_label.pack()
+        self.title_label.pack(pady=20)
 
         song_button_frame = tk.Frame(self.play_tab)
         self.back_button = tk.Button(song_button_frame, image=self.back_image, bd=0, command=self.back_song)
@@ -123,8 +123,8 @@ class Manager:
         self.action_widget.add(self.playlist_tab, text='Playlists')
 
         # Pack widgets to root
-        self.file_widget.pack(expand=1, side=tk.LEFT, fill="both")
-        self.action_widget.pack(expand=0, side=tk.RIGHT, fill="both")
+        self.file_widget.pack(expand=True, side=tk.LEFT, fill="both")
+        self.action_widget.pack(expand=False, side=tk.RIGHT, fill="both")
 
     def build_file_tree(self, top, parentid=""):
         tree = {top: []}
@@ -181,9 +181,6 @@ class Manager:
             # highlight item item dictated by the queue index
             current_item = self.song_queue.get_children()[self.queue_index]
             self.song_queue.selection_set(current_item)
-            # resize queue widget as needed
-            # self.song_queue.config(height=50)
-            # TODO: figure out how to dynamicallt resize the song_queue Treeview
 
         # toggle play/pause image
         path = self.get_queued_filename()
