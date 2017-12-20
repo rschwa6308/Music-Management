@@ -1,0 +1,4 @@
+install pyinstaller (on pip)
+cd to the root directory of the program (If you don't do this, the files will show up in the wrong place)
+run pyinstaller "\path\to\Music Manager.py"
+open the dist folder and make sure the exectuable works. The one in the build folder does not work.
