@@ -1,4 +1,5 @@
 import os
+import sys
 import tkinter as tk
 from tkinter import font
 from tkinter import ttk
@@ -50,8 +51,7 @@ class Manager:
         self.queued_song = None
 
         # self.album_art = ImageTk.PhotoImage(Image.open("Assets/musical notes.png"))
-        self.assetpath = os.path.abspath('.\\Assets')
-        print(os.path.exists(self.assetpath))
+        self.assetpath = os.path.join(os.path.dirname(sys.argv[0]), 'Assets') #sys.argv[0] is the script name "#os.path.join(os.path.realpath('.'), 'Assets')#os.path.realpath('.\\Assets') #this may have issues running from IDEs
         self.play_image = ImageTk.PhotoImage(Image.open(os.path.join(self.assetpath, "play.png")))
         self.pause_image = ImageTk.PhotoImage(Image.open(os.path.join(self.assetpath, "pause.png")))
         self.back_image = ImageTk.PhotoImage(Image.open(os.path.join(self.assetpath, "previous.png")))
