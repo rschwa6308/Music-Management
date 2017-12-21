@@ -50,10 +50,12 @@ class Manager:
         self.queued_song = None
 
         # self.album_art = ImageTk.PhotoImage(Image.open("Assets/musical notes.png"))
-        self.play_image = ImageTk.PhotoImage(Image.open("Assets/play.png"))
-        self.pause_image = ImageTk.PhotoImage(Image.open("Assets/pause.png"))
-        self.back_image = ImageTk.PhotoImage(Image.open("Assets/previous.png"))
-        self.next_image = ImageTk.PhotoImage(Image.open("Assets/next.png"))
+        self.assetpath = os.path.abspath('.\\Assets')
+        print(os.path.exists(self.assetpath))
+        self.play_image = ImageTk.PhotoImage(Image.open(os.path.join(self.assetpath, "play.png")))
+        self.pause_image = ImageTk.PhotoImage(Image.open(os.path.join(self.assetpath, "pause.png")))
+        self.back_image = ImageTk.PhotoImage(Image.open(os.path.join(self.assetpath, "previous.png")))
+        self.next_image = ImageTk.PhotoImage(Image.open(os.path.join(self.assetpath, "next.png")))
 
         # self.album_art_label = ttk.Label(self.play_tab, image=self.album_art)
         # self.album_art_label.pack() # grid(row=0, column=0, columnspan=3)

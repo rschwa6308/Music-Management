@@ -1,0 +1,3 @@
+install pyinstaller
+cd to project root directory (or build files don't show up)
+run pyinstaller -D "Music Manager.spec"
