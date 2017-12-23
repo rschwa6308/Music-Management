@@ -27,7 +27,7 @@ class Manager:
         self.tag_list_keys = ['#t', '#r', '#a', '#n', '#d']
 
         ### File Widget ###
-        self.library = ".\\Music"
+        self.library = "E:\\Music"
 
         self.file_widget = ttk.Treeview(self.root)
         self.selected = None

@@ -3,3 +3,4 @@ Submission for QuHacks 2017 (3rd place). A music library management library writ
 
 # Dependencies
 - Mutagen (https://pypi.python.org/pypi/mutagen)
+- Pygame
