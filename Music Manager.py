@@ -5,7 +5,7 @@ from tkinter import ttk
 
 import pygame.mixer
 from PIL import Image, ImageTk
-# from mutagen.easyid3 import EasyID3
+from time import sleep
 
 from Helpers.covert import *
 from Helpers.edit import *
@@ -95,6 +95,9 @@ class Manager:
             checkbutton.deselect()
             checkbutton.grid(row=1 + i, column=1, sticky=tk.W)
         search_entry_frame.pack()
+
+        self.progressbar = ttk.Progressbar(self.play_tab, orient="horizontal", length=500, mode="determinate")
+        self.progressbar.pack()
 
         self.results_list = ttk.Treeview(self.search_tab)
         self.results_list.pack(fill=tk.BOTH, expand=True, pady=5, padx=5)
@@ -277,6 +280,11 @@ class Manager:
         self.update_action_widget()
         self.play_toggle()
 
+    def stop(self):
+        self.playing = False
+        pygame.mixer.music.stop()
+        self.update_action_widget()
+
     def save(self):
         # print("saving!")
         path = self.get_selected_filename()
@@ -299,7 +307,19 @@ class Manager:
         convert(self.get_selected_filename(), self.filetype_entry.get())
 
     def run(self):
+        period = 1.0 / 60.0     # 60 fps
         while self.alive:
+            sleep(period)
+            # change song when finished
+            if self.playing:
+                if not pygame.mixer.music.get_busy():
+                    print("song over")
+                    if self.queue_index < len(self.song_queue.get_children()) - 1:
+                        self.next_song()
+                    else:
+                        pygame.mixer.music.stop()
+                        self.stop()
+            # update GUI when needed
             if self.file_widget.selection() != self.selected or self.queued_song != self.get_queued_filename():
                 # print("update")
                 self.selected = self.file_widget.selection()
