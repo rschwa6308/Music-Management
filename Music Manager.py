@@ -3,9 +3,11 @@ import tkinter as tk
 from tkinter import font
 from tkinter import ttk
 
+import mutagen
 import pygame.mixer
 from PIL import Image, ImageTk
 from time import sleep
+import datetime
 
 from Helpers.covert import *
 from Helpers.edit import *
@@ -22,6 +24,9 @@ class Manager:
         self.root.protocol('WM_DELETE_WINDOW', self.quit)
 
         self.default_font = font.nametofont("TkDefaultFont").configure(size=12)
+
+        s = ttk.Style()
+        s.theme_use('clam')
 
         self.tag_list = ["title", "artist", "album", "tracknumber", "date"]
         self.tag_list_keys = ['#t', '#r', '#a', '#n', '#d']
@@ -63,7 +68,7 @@ class Manager:
         self.title_label = ttk.Label(self.play_tab, font=("Helvetica", 18))
         self.title_label.pack(pady=15)
 
-        song_button_frame = tk.Frame(self.play_tab)
+        song_button_frame = ttk.Frame(self.play_tab)
         self.back_button = tk.Button(song_button_frame, image=self.back_image, bd=0, command=self.back_song)
         self.back_button.pack(side=tk.LEFT)
         self.play_button = tk.Button(song_button_frame, image=self.play_image, bd=0, command=self.play_toggle)
@@ -72,11 +77,21 @@ class Manager:
         self.next_button.pack(side=tk.LEFT)
         song_button_frame.pack(pady=10)
 
+        progress_frame = tk.Frame(self.play_tab)
+        # s.configure("blue.Horizontal.TProgressbar", foreground='blue', background='blue')
+        self.progressbar = ttk.Progressbar(progress_frame, orient="horizontal", length=500, mode="determinate") # , style="blue.Horizontal.TProgressbar")
+        self.progressbar.grid(row=0, column=0, columnspan=3)
+        self.song_pos_label = tk.Label(progress_frame, text="0:00")
+        self.song_pos_label.grid(row=1, column=0, sticky=tk.W)
+        self.song_length_label = tk.Label(progress_frame, text="0:00")
+        self.song_length_label.grid(row=1, column=2, sticky=tk.E)
+        progress_frame.pack(pady=15)
+
         # Search Tab
         self.search_tab = ttk.Frame(self.action_widget)
         self.action_widget.add(self.search_tab, text='Search')
 
-        search_entry_frame = tk.Frame(self.search_tab)
+        search_entry_frame = ttk.Frame(self.search_tab)
         self.search_entry = ttk.Entry(search_entry_frame, font=("Arial", 12))
         self.search_entry.grid(row=0, column=0, columnspan=2)
         self.submit_button = ttk.Button(search_entry_frame, text="go", command=self.search, width=3)
@@ -95,9 +110,6 @@ class Manager:
             checkbutton.deselect()
             checkbutton.grid(row=1 + i, column=1, sticky=tk.W)
         search_entry_frame.pack()
-
-        self.progressbar = ttk.Progressbar(self.play_tab, orient="horizontal", length=500, mode="determinate")
-        self.progressbar.pack()
 
         self.results_list = ttk.Treeview(self.search_tab)
         self.results_list.pack(fill=tk.BOTH, expand=True, pady=5, padx=5)
@@ -218,11 +230,17 @@ class Manager:
             else:
                 self.next_button["state"] = "normal"
 
-        # update song info label
+        # update song info label and progress bar max length
         if path:
             if os.path.isfile(path):
                 try:
                     item_tags = EasyID3(path)
+                    length = round(mutagen.File(path).info.length)
+                    self.progressbar["maximum"] = length
+                    m, s = divmod(length, 60)
+                    if s < 10:
+                        s = "0" + str(s)
+                    self.song_length_label["text"] = "{0}:{1}".format(m, s)
                 except:
                     pass
             try:
@@ -262,6 +280,7 @@ class Manager:
                         pygame.mixer.music.load(path)
                         pygame.mixer.music.play()
                         self.current_song = path
+                        # self.progressbar["value"] = 0
                     except:
                         pass
 
@@ -310,8 +329,8 @@ class Manager:
         period = 1.0 / 60.0     # 60 fps
         while self.alive:
             sleep(period)
-            # change song when finished
             if self.playing:
+                # change song when finished
                 if not pygame.mixer.music.get_busy():
                     print("song over")
                     if self.queue_index < len(self.song_queue.get_children()) - 1:
@@ -319,6 +338,14 @@ class Manager:
                     else:
                         pygame.mixer.music.stop()
                         self.stop()
+                # update progressbar
+                else:
+                    pos = pygame.mixer.music.get_pos() / 1000
+                    self.progressbar["value"] = pos
+                    m, s = divmod(round(pos), 60)
+                    if s < 10:
+                        s = "0" + str(s)
+                    self.song_pos_label["text"] = "{0}:{1}".format(m, s)
             # update GUI when needed
             if self.file_widget.selection() != self.selected or self.queued_song != self.get_queued_filename():
                 # print("update")
