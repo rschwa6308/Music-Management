@@ -77,7 +77,7 @@ class Manager:
         self.next_button.pack(side=tk.LEFT)
         song_button_frame.pack(pady=10)
 
-        progress_frame = tk.Frame(self.play_tab)
+        progress_frame = ttk.Frame(self.play_tab)
         # s.configure("blue.Horizontal.TProgressbar", foreground='blue', background='blue')
         self.progressbar = ttk.Progressbar(progress_frame, orient="horizontal", length=500, mode="determinate") # , style="blue.Horizontal.TProgressbar")
         self.progressbar.grid(row=0, column=0, columnspan=3)
