@@ -62,7 +62,7 @@ class Manager:
 
         # self.album_art_label = ttk.Label(self.play_tab, image=self.album_art)
         # self.album_art_label.pack() # grid(row=0, column=0, columnspan=3)
-        self.song_queue = ttk.Treeview(self.play_tab, height=10, selectmode="browse")
+        self.song_queue = ttk.Treeview(self.play_tab, height=10, selectmode="browse", show="tree")
         self.song_queue.column("#0", stretch=True)
         self.song_queue.pack(fill=tk.BOTH, expand=True, pady=5, padx=5)
         self.title_label = ttk.Label(self.play_tab, font=("Helvetica", 18))
@@ -81,9 +81,9 @@ class Manager:
         # s.configure("blue.Horizontal.TProgressbar", foreground='blue', background='blue')
         self.progressbar = ttk.Progressbar(progress_frame, orient="horizontal", length=500, mode="determinate") # , style="blue.Horizontal.TProgressbar")
         self.progressbar.grid(row=0, column=0, columnspan=3)
-        self.song_pos_label = tk.Label(progress_frame, text="0:00")
+        self.song_pos_label = ttk.Label(progress_frame, text="0:00")
         self.song_pos_label.grid(row=1, column=0, sticky=tk.W)
-        self.song_length_label = tk.Label(progress_frame, text="0:00")
+        self.song_length_label = ttk.Label(progress_frame, text="0:00")
         self.song_length_label.grid(row=1, column=2, sticky=tk.E)
         progress_frame.pack(pady=15)
 
@@ -97,7 +97,7 @@ class Manager:
         self.submit_button = ttk.Button(search_entry_frame, text="go", command=self.search, width=3)
         self.submit_button.grid(row=0, column=2)
 
-        tk.Label(search_entry_frame, text="", width=60).grid(row=0, column=3)
+        ttk.Label(search_entry_frame, text="", width=60).grid(row=0, column=3)
 
         self.search_checkbutton_vars = {tag: tk.IntVar() for tag in self.tag_list}
         self.search_checkbuttons = {
@@ -127,9 +127,9 @@ class Manager:
         # Convert Tab
         self.convert_tab = ttk.Frame(self.action_widget)
         self.action_widget.add(self.convert_tab, text='Convert')
-        self.filename_label = tk.Label(self.convert_tab)
+        self.filename_label = ttk.Label(self.convert_tab)
         self.filename_label.grid(row=0, column=0, columnspan=10, sticky=tk.W)
-        tk.Label(self.convert_tab, text="Convert to: ").grid(row=1, column=0)
+        ttk.Label(self.convert_tab, text="Convert to: ").grid(row=1, column=0)
         self.filetype_entry = ttk.Combobox(self.convert_tab, values=[".mp3", ".wav"])
         self.filetype_entry.grid(row=1, column=1)
         ttk.Button(self.convert_tab, text="go", width=8, command=self.convert).grid(row=2, column=0, columnspan=2)
