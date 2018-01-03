@@ -68,6 +68,7 @@ class Manager:
         self.title_label = ttk.Label(self.play_tab, font=("Helvetica", 18))
         self.title_label.pack(pady=15)
 
+        # TODO: make into ttk buttons (needs custom theme to disable border)
         song_button_frame = ttk.Frame(self.play_tab)
         self.back_button = tk.Button(song_button_frame, image=self.back_image, bd=0, command=self.back_song)
         self.back_button.pack(side=tk.LEFT)
